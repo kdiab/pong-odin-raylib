@@ -4,35 +4,43 @@ import rl "vendor:raylib"
 import "core:fmt"
 
 main :: proc() {
-	barPos : i32 = 100
-	ballPos : i32 = 150
-	direction : i32 = 1
 	WIDTH :: 1280
 	HEIGHT :: 720
-	BARWIDTH :: 180
+
+	paddle := rl.Rectangle{100, 100, 180, 30} // x y width height
+	paddleSpeed : f32 = 10
+
+	ball := rl.Rectangle{100, 150, 30, 30} // x y width height
+	ballDirection := rl.Vector2{0, -1}
+	ballSpeed : f32 = 10
 
 	rl.InitWindow(WIDTH, HEIGHT, "Pong")
 	rl.SetTargetFPS(60)
+
 	for !rl.WindowShouldClose() {
 		if rl.IsKeyDown(rl.KeyboardKey.D) {
-			if barPos < WIDTH - BARWIDTH {
-				barPos += 10
+			if paddle.x < WIDTH - paddle.width {
+				paddle.x += 10
 			}
 		}
 		if rl.IsKeyDown(rl.KeyboardKey.A) {
-			if barPos > 0 {
-				barPos -= 10
+			if paddle.x > 0 {
+				paddle.x -= 10
 			}
 		}
-		nextPos := ballPos + 10 * direction
-		if nextPos >= 720 - 30 || nextPos <= 0 {
-			direction *= -1
+
+		nextBall := ball
+		nextBall.y += ballSpeed * ballDirection.y
+		if nextBall.y >= 720 - ball.height || nextBall.y <= 0 {
+			ballDirection.y *= -1
 		}
-		ballPos += 10 * direction
+
+		ball.y += ballSpeed * ballDirection.y
+
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.BLACK)
-		rl.DrawRectangle(barPos,100,BARWIDTH, 30,rl.WHITE)
-		rl.DrawRectangle(100,ballPos,30,30,rl.RED)
+		rl.DrawRectangleRec(paddle, rl.WHITE)
+		rl.DrawRectangleRec(ball, rl.RED)
 		rl.EndDrawing()
 	}
 }
